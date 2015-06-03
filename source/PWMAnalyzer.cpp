@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "PWMAnalyzer.h"
 #include "PWMAnalyzerSettings.h"
 #include <AnalyzerChannelData.h>
@@ -35,6 +37,7 @@ void PWMAnalyzer::WorkerThread()
     }
     mPWM->AdvanceToNextEdge();
 
+    double prev = 0;
     for (;;) {
         U64 start = mPWM->GetSampleNumber(); // Falling Edge
 
@@ -43,20 +46,23 @@ void PWMAnalyzer::WorkerThread()
         U64 end = mPWM->GetSampleNumber();
 
         U64 width = SamplesToUs(end - start);
+ 
+        if (std::abs(double(width) - prev) > mSettings->mMinChange) {
+            prev = width;
+            //let's put a dot exactly where we sample this bit:
+            mResults->AddMarker(end - ((end - start) / 2), AnalyzerResults::Dot, mSettings->mInputChannel);
 
-        //let's put a dot exactly where we sample this bit:
-        mResults->AddMarker(end - ((end - start) / 2), AnalyzerResults::Dot, mSettings->mInputChannel);
+            //we have a byte to save.
+            Frame frame;
+            frame.mData1 = width;
+            frame.mFlags = 0;
+            frame.mStartingSampleInclusive = start;
+            frame.mEndingSampleInclusive = mPWM->GetSampleNumber();
 
-        //we have a byte to save.
-        Frame frame;
-        frame.mData1 = width;
-        frame.mFlags = 0;
-        frame.mStartingSampleInclusive = start;
-        frame.mEndingSampleInclusive = mPWM->GetSampleNumber();
-
-        mResults->AddFrame(frame);
-        mResults->CommitResults();
-        ReportProgress(frame.mEndingSampleInclusive);
+            mResults->AddFrame(frame);
+            mResults->CommitResults();
+            ReportProgress(frame.mEndingSampleInclusive);
+        }
 
         mPWM->AdvanceToNextEdge(); // Rising edge
     }
