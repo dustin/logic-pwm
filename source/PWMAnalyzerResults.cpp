@@ -21,8 +21,14 @@ void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
     ClearResultStrings();
     Frame frame = GetFrame(frame_index);
 
-    char number_str[128];
-    snprintf(number_str, sizeof(number_str), "%d", frame.mData1);
+    char number_str[128] = {0};
+    char delta_str[128] = {0};
+    if (frame.mData2 != 0) {
+        snprintf(delta_str, sizeof(number_str), " (%s%d)",
+                 ((int)frame.mData2 > 0 ? "+" : ""), frame.mData2);
+    }
+
+    snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
     AddResultString(number_str);
 }
 
@@ -62,7 +68,13 @@ void PWMAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
     ClearTabularText();
 
     char number_str[128];
-    snprintf(number_str, sizeof(number_str), "%d", frame.mData1);
+    char delta_str[128] = {0};
+    if (frame.mData2 != 0) {
+        snprintf(delta_str, sizeof(number_str), " (%s%d)",
+                 ((int)frame.mData2 > 0 ? "+" : ""), frame.mData2);
+    }
+
+    snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
     AddTabularText(number_str);
 }
 

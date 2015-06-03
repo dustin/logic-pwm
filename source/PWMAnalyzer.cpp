@@ -51,11 +51,10 @@ void PWMAnalyzer::WorkerThread()
                                 width > prev ? AnalyzerResults::UpArrow : AnalyzerResults::DownArrow,
                                 mSettings->mInputChannel);
 
-            prev = width;
-
             //we have a byte to save.
             Frame frame;
             frame.mData1 = width;
+            frame.mData2 = prev > 0 ? width - prev : 0;
             frame.mFlags = 0;
             frame.mStartingSampleInclusive = start;
             frame.mEndingSampleInclusive = mPWM->GetSampleNumber();
@@ -63,6 +62,8 @@ void PWMAnalyzer::WorkerThread()
             mResults->AddFrame(frame);
             mResults->CommitResults();
             ReportProgress(frame.mEndingSampleInclusive);
+
+            prev = width;
         }
 
         mPWM->AdvanceToNextEdge(); // Rising edge
