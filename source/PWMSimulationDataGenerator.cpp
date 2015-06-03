@@ -3,7 +3,9 @@
 
 #include <AnalyzerHelpers.h>
 
-PWMSimulationDataGenerator::PWMSimulationDataGenerator()
+PWMSimulationDataGenerator::PWMSimulationDataGenerator() : rgen(),
+                                                           rdist(.5),
+                                                           pulseLen(1500)
 {
 }
 
@@ -16,9 +18,6 @@ void PWMSimulationDataGenerator::Initialize(U32 simulation_sample_rate,
 {
     mSimulationSampleRateHz = simulation_sample_rate;
     mSettings = settings;
-
-    pulseLen = 1000;
-    incr = 13;
 
     mPWMSimulationData.SetChannel(mSettings->mInputChannel);
     mPWMSimulationData.SetSampleRate(simulation_sample_rate);
@@ -36,26 +35,16 @@ U32 PWMSimulationDataGenerator::GenerateSimulationData(U64 largest_sample_reques
                                             mSimulationSampleRateHz);
 
     while (mPWMSimulationData.GetCurrentSampleNumber() < adjusted_largest_sample_requested) {
-        Pulse(pulseLen);
-        pulseLen += incr;
-        if (pulseLen > 2000) {
-            pulseLen -= incr;
-            incr = -incr;
-        } else if (pulseLen < 1000) {
-            pulseLen += incr;
-            incr = -incr;
-        }
+        double by = 10*rdist(rgen)*(rgen()&1?1:-1);
+        pulseLen += (pulseLen+by > 2000 || pulseLen+by < 1000) ? -by : by;
+
+        mPWMSimulationData.Advance(mSimulationSampleRateHz / 50);
+
+        mPWMSimulationData.TransitionIfNeeded(BIT_HIGH);
+        mPWMSimulationData.Advance(mClockGenerator.AdvanceByTimeS(pulseLen * 1E-6));
+        mPWMSimulationData.TransitionIfNeeded(BIT_LOW);
     }
 
     *simulation_channel = &mPWMSimulationData;
     return 1;
-}
-
-void PWMSimulationDataGenerator::Pulse(double duration)
-{
-    mPWMSimulationData.Advance(mSimulationSampleRateHz / 50);
-
-    mPWMSimulationData.TransitionIfNeeded(BIT_HIGH);
-    mPWMSimulationData.Advance(mClockGenerator.AdvanceByTimeS(duration * 1E-6));
-    mPWMSimulationData.TransitionIfNeeded(BIT_LOW);
 }

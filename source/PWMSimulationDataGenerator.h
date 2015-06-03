@@ -1,6 +1,8 @@
 #ifndef PWM_SIMULATION_DATA_GENERATOR
 #define PWM_SIMULATION_DATA_GENERATOR
 
+#include <random>
+
 #include <AnalyzerHelpers.h>
 
 #include <SimulationChannelDescriptor.h>
@@ -23,10 +25,9 @@ protected:
     SimulationChannelDescriptor mPWMSimulationData;
     ClockGenerator mClockGenerator;
 
-    void Pulse(double duration);
-
+    std::mt19937 rgen;
+    std::exponential_distribution<> rdist;
     double pulseLen;
-    double incr;
 
 };
 #endif //PWM_SIMULATION_DATA_GENERATOR
