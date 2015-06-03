@@ -44,13 +44,14 @@ void PWMAnalyzer::WorkerThread()
         mPWM->AdvanceToNextEdge();
 
         U64 end = mPWM->GetSampleNumber();
-
         U64 width = SamplesToUs(end - start);
- 
+
         if (std::abs(double(width) - prev) >= mSettings->mMinChange) {
+            mResults->AddMarker(end - ((end - start) / 2),
+                                width > prev ? AnalyzerResults::UpArrow : AnalyzerResults::DownArrow,
+                                mSettings->mInputChannel);
+
             prev = width;
-            //let's put a dot exactly where we sample this bit:
-            mResults->AddMarker(end - ((end - start) / 2), AnalyzerResults::Dot, mSettings->mInputChannel);
 
             //we have a byte to save.
             Frame frame;
