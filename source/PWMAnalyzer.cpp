@@ -47,7 +47,7 @@ void PWMAnalyzer::WorkerThread()
 
         U64 width = SamplesToUs(end - start);
  
-        if (std::abs(double(width) - prev) > mSettings->mMinChange) {
+        if (std::abs(double(width) - prev) >= mSettings->mMinChange) {
             prev = width;
             //let's put a dot exactly where we sample this bit:
             mResults->AddMarker(end - ((end - start) / 2), AnalyzerResults::Dot, mSettings->mInputChannel);
