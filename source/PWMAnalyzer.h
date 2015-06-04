@@ -22,13 +22,14 @@ public:
     virtual const char *GetAnalyzerName() const;
     virtual bool NeedsRerun();
 
+    double DutyCycle(U64 start, U64 mid, U64 end) { return 100.0 * double(mid-start) / double(end-start); }
+    double Width(U64 l, U64 m) { return (double)SamplesToUs(m - l); }
+    double Value(U64 l, U64 m, U64 e);
+
 protected: //vars
     std::auto_ptr< PWMAnalyzerSettings > mSettings;
     std::auto_ptr< PWMAnalyzerResults > mResults;
     AnalyzerChannelData *mPWM;
-
-    void AnalyzeWidth();
-    void AnalyzeDutyCycle();
 
     PWMSimulationDataGenerator mSimulationDataGenerator;
     bool mSimulationInitilized;

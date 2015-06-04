@@ -21,7 +21,9 @@ public:
 
 protected: //functions
 
-    double CalculateDuty(Frame f);
+    double DutyCycle(Frame frame);
+    U32 Width(Frame frame);
+    void FillDelta(U64 frame_index, char *b, size_t len);
 
 protected:  //vars
     PWMAnalyzerSettings *mSettings;

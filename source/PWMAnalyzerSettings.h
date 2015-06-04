@@ -4,6 +4,9 @@
 #include <AnalyzerSettings.h>
 #include <AnalyzerTypes.h>
 
+#define ANALYSIS_WIDTH 1
+#define ANALYSIS_DUTY  2
+
 class PWMAnalyzerSettings : public AnalyzerSettings
 {
 public:

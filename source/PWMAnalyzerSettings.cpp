@@ -1,4 +1,3 @@
-#include <iostream>
 #include "PWMAnalyzerSettings.h"
 #include <AnalyzerHelpers.h>
 
@@ -6,7 +5,7 @@
 PWMAnalyzerSettings::PWMAnalyzerSettings()
     :   mInputChannel(UNDEFINED_CHANNEL),
         mMinChange(3),
-        mAnalysisType(0)
+        mAnalysisType(ANALYSIS_WIDTH)
 {
     mInputChannelInterface.reset(new AnalyzerSettingInterfaceChannel());
     mInputChannelInterface->SetTitleAndTooltip("PWM", "Simple Standard PWM Analyzer");
@@ -15,8 +14,8 @@ PWMAnalyzerSettings::PWMAnalyzerSettings()
     mAnalysisTypeInterface.reset(new AnalyzerSettingInterfaceNumberList());
     mAnalysisTypeInterface->SetTitleAndTooltip("Analysis Type",
                                           "What is important in analyzing this pwm stream?");
-    mAnalysisTypeInterface->AddNumber(0, "Pulse Width", "The width of high pulses");
-    mAnalysisTypeInterface->AddNumber(1, "Duty Cycle", "The duty cycle between high and low");
+    mAnalysisTypeInterface->AddNumber(ANALYSIS_WIDTH, "Pulse Width", "The width of high pulses");
+    mAnalysisTypeInterface->AddNumber(ANALYSIS_DUTY, "Duty Cycle", "The duty cycle between high and low");
     mAnalysisTypeInterface->SetNumber(mAnalysisType);
 
     mMinChangeInterface.reset(new AnalyzerSettingInterfaceInteger());

@@ -2,7 +2,6 @@
 #include <AnalyzerHelpers.h>
 #include "PWMAnalyzer.h"
 #include "PWMAnalyzerSettings.h"
-#include <iostream>
 #include <fstream>
 
 PWMAnalyzerResults::PWMAnalyzerResults(PWMAnalyzer *analyzer, PWMAnalyzerSettings *settings)
@@ -16,10 +15,15 @@ PWMAnalyzerResults::~PWMAnalyzerResults()
 {
 }
 
-double PWMAnalyzerResults::CalculateDuty(Frame f)
+double PWMAnalyzerResults::DutyCycle(Frame frame)
 {
-    return 100.0 * double(f.mData1 - f.mStartingSampleInclusive) /
-        double(f.mEndingSampleInclusive - f.mStartingSampleInclusive);
+    return mAnalyzer->DutyCycle(frame.mStartingSampleInclusive, frame.mData1,
+                                frame.mEndingSampleInclusive);
+}
+
+U32 PWMAnalyzerResults::Width(Frame frame)
+{
+    return (U32)mAnalyzer->Width(frame.mStartingSampleInclusive, frame.mData1);
 }
 
 void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, DisplayBase display_base)
@@ -29,15 +33,12 @@ void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
     char number_str[128] = {0};
     char delta_str[128] = {0};
-    if (frame.mData2 != 0) {
-        snprintf(delta_str, sizeof(number_str), " (%s%d)",
-                 ((int)frame.mData2 > 0 ? "+" : ""), frame.mData2);
-    }
+    FillDelta(frame_index, delta_str, sizeof(delta_str));
 
-    if (mSettings->mAnalysisType == 0) {
-        snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
+    if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
+        snprintf(number_str, sizeof(number_str), "%d%s", Width(frame), delta_str);
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", CalculateDuty(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f%%%s", DutyCycle(frame), delta_str);
     }
     AddResultString(number_str);
 }
@@ -59,10 +60,10 @@ void PWMAnalyzerResults::GenerateExportFile(const char *file, DisplayBase displa
         AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, 128);
 
         char number_str[128];
-        if (mSettings->mAnalysisType == 0) {
-            snprintf(number_str, sizeof(number_str), "%d", frame.mData1);
+        if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
+            snprintf(number_str, sizeof(number_str), "%d", Width(frame));
         } else {
-            snprintf(number_str, sizeof(number_str), "%.1f", CalculateDuty(frame));
+            snprintf(number_str, sizeof(number_str), "%.1f", DutyCycle(frame));
         }
 
         file_stream << time_str << "," << number_str << std::endl;
@@ -83,18 +84,32 @@ void PWMAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
     char number_str[128];
     char delta_str[128] = {0};
-    if (frame.mData2 != 0) {
-        snprintf(delta_str, sizeof(number_str), " (%s%d)",
-                 ((int)frame.mData2 > 0 ? "+" : ""), frame.mData2);
-    }
+    FillDelta(frame_index, delta_str, sizeof(delta_str));
 
-    if (mSettings->mAnalysisType == 0) {
-        snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
+    if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
+        snprintf(number_str, sizeof(number_str), "%d%s", Width(frame), delta_str);
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", CalculateDuty(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f%%%s", DutyCycle(frame), delta_str);
     }
 
     AddTabularText(number_str);
+}
+
+void PWMAnalyzerResults::FillDelta(U64 frame_index, char *b, size_t len)
+{
+    if (frame_index == 0) {
+        return;
+    }
+
+    Frame current = GetFrame(frame_index);
+    Frame prev = GetFrame(frame_index-1);
+
+    double val = mAnalyzer->Value(current.mStartingSampleInclusive, current.mData1,
+                                  current.mEndingSampleInclusive);
+    double prevval = mAnalyzer->Value(prev.mStartingSampleInclusive, prev.mData1,
+                                      prev.mEndingSampleInclusive);
+
+    snprintf(b, len, " (%s%.0f)", (val-prevval > 0 ? "+" : ""), val-prevval);
 }
 
 void PWMAnalyzerResults::GeneratePacketTabularText(U64 packet_id, DisplayBase display_base)
