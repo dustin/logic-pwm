@@ -30,7 +30,8 @@ void PWMAnalyzer::WorkerThread()
     mSampleRateHz = GetSampleRate();
     mPWM = GetAnalyzerChannelData(mSettings->mInputChannel);
 
-    // Wait for a clean start
+    // Find the next full pulse for a clean start.
+    mPWM->AdvanceToNextEdge();
     if (mPWM->GetBitState() == BIT_LOW) {
         mPWM->AdvanceToNextEdge();
     }
