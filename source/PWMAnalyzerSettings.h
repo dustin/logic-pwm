@@ -18,11 +18,12 @@ public:
 
     Channel mInputChannel;
     int mMinChange;
+    int mAnalysisType;
 
 protected:
     std::auto_ptr< AnalyzerSettingInterfaceChannel >    mInputChannelInterface;
     std::auto_ptr< AnalyzerSettingInterfaceInteger >    mMinChangeInterface;
-
+    std::auto_ptr< AnalyzerSettingInterfaceNumberList > mAnalysisTypeInterface;
 };
 
 #endif //PWM_ANALYZER_SETTINGS

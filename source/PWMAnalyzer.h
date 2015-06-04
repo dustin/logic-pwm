@@ -27,6 +27,9 @@ protected: //vars
     std::auto_ptr< PWMAnalyzerResults > mResults;
     AnalyzerChannelData *mPWM;
 
+    void AnalyzeWidth();
+    void AnalyzeDutyCycle();
+
     PWMSimulationDataGenerator mSimulationDataGenerator;
     bool mSimulationInitilized;
 
