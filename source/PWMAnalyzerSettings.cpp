@@ -29,8 +29,7 @@ PWMAnalyzerSettings::PWMAnalyzerSettings()
     AddInterface(mMinChangeInterface.get());
     AddInterface(mAnalysisTypeInterface.get());
 
-    AddExportOption(0, "Export as text/csv file");
-    AddExportExtension(0, "text", "txt");
+    AddExportOption(0, "Export as csv file");
     AddExportExtension(0, "csv", "csv");
 
     ClearChannels();
