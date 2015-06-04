@@ -16,6 +16,12 @@ PWMAnalyzerResults::~PWMAnalyzerResults()
 {
 }
 
+double PWMAnalyzerResults::CalculateDuty(Frame f)
+{
+    return 100.0 * double(f.mData1 - f.mStartingSampleInclusive) /
+        double(f.mEndingSampleInclusive - f.mStartingSampleInclusive);
+}
+
 void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, DisplayBase display_base)
 {
     ClearResultStrings();
@@ -31,7 +37,7 @@ void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
     if (mSettings->mAnalysisType == 0) {
         snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", (double)frame.mData1/10.0, delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f%%%s", CalculateDuty(frame), delta_str);
     }
     AddResultString(number_str);
 }
@@ -56,7 +62,7 @@ void PWMAnalyzerResults::GenerateExportFile(const char *file, DisplayBase displa
         if (mSettings->mAnalysisType == 0) {
             snprintf(number_str, sizeof(number_str), "%d", frame.mData1);
         } else {
-            snprintf(number_str, sizeof(number_str), "%.1f", (double)frame.mData1/10.0);
+            snprintf(number_str, sizeof(number_str), "%.1f", CalculateDuty(frame));
         }
 
         file_stream << time_str << "," << number_str << std::endl;
@@ -85,7 +91,7 @@ void PWMAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
     if (mSettings->mAnalysisType == 0) {
         snprintf(number_str, sizeof(number_str), "%d%s", frame.mData1, delta_str);
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", (double)frame.mData1/10.0, delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f%%%s", CalculateDuty(frame), delta_str);
     }
 
     AddTabularText(number_str);

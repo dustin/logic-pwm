@@ -102,9 +102,8 @@ void PWMAnalyzer::AnalyzeDutyCycle()
                                 dooty > prev ? AnalyzerResults::UpArrow : AnalyzerResults::DownArrow,
                                 mSettings->mInputChannel);
 
-            //we have a byte to save.
             Frame frame;
-            frame.mData1 = dooty*10.0;
+            frame.mData1 = high;
             frame.mData2 = prev > 0 ? dooty - prev : 0;
             frame.mFlags = 0;
             frame.mStartingSampleInclusive = start;

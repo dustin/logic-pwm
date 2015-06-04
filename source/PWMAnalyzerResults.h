@@ -21,6 +21,8 @@ public:
 
 protected: //functions
 
+    double CalculateDuty(Frame f);
+
 protected:  //vars
     PWMAnalyzerSettings *mSettings;
     PWMAnalyzer *mAnalyzer;
