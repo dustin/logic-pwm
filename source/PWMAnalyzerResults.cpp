@@ -50,7 +50,7 @@ void PWMAnalyzerResults::GenerateExportFile(const char *file, DisplayBase displa
     U64 trigger_sample = mAnalyzer->GetTriggerSample();
     U32 sample_rate = mAnalyzer->GetSampleRate();
 
-    file_stream << "Time [s],High,Low,Duty" << std::endl;
+    file_stream << "Time [s],High,Low,Duty,Frequency" << std::endl;
 
     U64 num_frames = GetNumFrames();
     for (U32 i = 0; i < num_frames; i++) {
@@ -60,10 +60,11 @@ void PWMAnalyzerResults::GenerateExportFile(const char *file, DisplayBase displa
         AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, 128);
 
         char number_str[128];
-        snprintf(number_str, sizeof(number_str), "%d,%d,%f",
+        snprintf(number_str, sizeof(number_str), "%d,%d,%f,%.1f",
                  Width(frame),
                  (U32)mAnalyzer->Width(frame.mData1, frame.mEndingSampleInclusive),
-                 DutyCycle(frame));
+                 DutyCycle(frame),
+                 1000000.0 / mAnalyzer->Width(frame.mStartingSampleInclusive, frame.mEndingSampleInclusive));
 
         file_stream << time_str << "," << number_str << std::endl;
 
