@@ -23,7 +23,7 @@ public:
     virtual bool NeedsRerun();
 
     double DutyCycle(U64 start, U64 mid, U64 end) { return 100.0 * double(mid-start) / double(end-start); }
-    double Width(U64 l, U64 m) { return (double)SamplesToUs(m - l); }
+    double Width(U64 l, U64 m) { return SamplesToUs(m - l); }
     double Value(U64 l, U64 m, U64 e);
 
 protected: //vars
@@ -34,7 +34,7 @@ protected: //vars
     PWMSimulationDataGenerator mSimulationDataGenerator;
     bool mSimulationInitilized;
 
-    U64 SamplesToUs(U64 samples);
+    double SamplesToUs(U64 samples);
 
     //PWM analysis vars:
     U32 mSampleRateHz;

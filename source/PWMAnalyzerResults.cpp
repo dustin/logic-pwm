@@ -21,9 +21,9 @@ double PWMAnalyzerResults::DutyCycle(Frame frame)
                                 frame.mEndingSampleInclusive);
 }
 
-U32 PWMAnalyzerResults::Width(Frame frame)
+double PWMAnalyzerResults::Width(Frame frame)
 {
-    return (U32)mAnalyzer->Width(frame.mStartingSampleInclusive, frame.mData1);
+    return mAnalyzer->Width(frame.mStartingSampleInclusive, frame.mData1);
 }
 
 void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, DisplayBase display_base)
@@ -33,13 +33,19 @@ void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
     char number_str[128] = {0};
     char delta_str[128] = {0};
+    char *units = NULL;
     FillDelta(frame_index, delta_str, sizeof(delta_str));
 
     if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
-        snprintf(number_str, sizeof(number_str), "%d%s", Width(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), Width(frame) > 9 ? "%.0f" : "%.1f", Width(frame));
+        units = " μS";
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", DutyCycle(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f", DutyCycle(frame));
+        units = "%";
     }
+    AddResultString(number_str, units, delta_str);
+    AddResultString(number_str, delta_str);
+    AddResultString(number_str, units);
     AddResultString(number_str);
 }
 
@@ -60,9 +66,9 @@ void PWMAnalyzerResults::GenerateExportFile(const char *file, DisplayBase displa
         AnalyzerHelpers::GetTimeString(frame.mStartingSampleInclusive, trigger_sample, sample_rate, time_str, 128);
 
         char number_str[128];
-        snprintf(number_str, sizeof(number_str), "%d,%d,%f,%.1f",
+        snprintf(number_str, sizeof(number_str), "%f,%f,%f,%.1f",
                  Width(frame),
-                 (U32)mAnalyzer->Width(frame.mData1, frame.mEndingSampleInclusive),
+                 mAnalyzer->Width(frame.mData1, frame.mEndingSampleInclusive),
                  DutyCycle(frame),
                  1000000.0 / mAnalyzer->Width(frame.mStartingSampleInclusive, frame.mEndingSampleInclusive));
 
@@ -84,15 +90,18 @@ void PWMAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
     char number_str[128];
     char delta_str[128] = {0};
+    char *units = NULL;
     FillDelta(frame_index, delta_str, sizeof(delta_str));
 
     if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
-        snprintf(number_str, sizeof(number_str), "%d%s", Width(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), Width(frame) > 9 ? "%.0f" : "%.1f", Width(frame));
+        units = " μS";
     } else {
-        snprintf(number_str, sizeof(number_str), "%.1f%%%s", DutyCycle(frame), delta_str);
+        snprintf(number_str, sizeof(number_str), "%.1f", DutyCycle(frame));
+        units = "%";
     }
 
-    AddTabularText(number_str);
+    AddTabularText(number_str, units, delta_str);
 }
 
 void PWMAnalyzerResults::FillDelta(U64 frame_index, char *b, size_t len)

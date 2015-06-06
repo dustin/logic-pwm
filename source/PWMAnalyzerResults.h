@@ -22,7 +22,7 @@ public:
 protected: //functions
 
     double DutyCycle(Frame frame);
-    U32 Width(Frame frame);
+    double Width(Frame frame);
     void FillDelta(U64 frame_index, char *b, size_t len);
 
 protected:  //vars

@@ -105,9 +105,9 @@ void DestroyAnalyzer(Analyzer *analyzer)
     delete analyzer;
 }
 
-U64 PWMAnalyzer::SamplesToUs(U64 samples)
+double PWMAnalyzer::SamplesToUs(U64 samples)
 {
-    return (samples * 1000000) / mSampleRateHz;
+    return ((double)samples * 1000000.0) / (double)mSampleRateHz;
 }
 
 double PWMAnalyzer::Value(U64 start, U64 mid, U64 end)
