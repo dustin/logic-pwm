@@ -9,7 +9,13 @@ if platform.system().lower() == "darwin":
 else:
     dylib_ext = ".so"
 
-print("Running on " + platform.system())
+#on 64 bit systems we must link the 64 bit version of libAnalyzer
+architecture_suffix = ""
+(architecture, _) = platform.architecture()
+if architecture == "64bit":
+    architecture_suffix = "64"
+
+print("Running on " + platform.system() + " " + architecture)
 
 #make sure the release folder exists, and clean out any .o/.so file if there are any
 if not os.path.exists( "release" ):
@@ -42,7 +48,7 @@ os.chdir( ".." )
 #specify the search paths/dependencies/options for gcc
 include_paths = [ "../include", "include" ]
 link_paths = [ "../lib", "lib" ]
-link_dependencies = [ "-lAnalyzer" ] #refers to libAnalyzer.dylib or libAnalyzer.so
+link_dependencies = [ "-lAnalyzer" + architecture_suffix ] #refers to libAnalyzer.dylib or libAnalyzer.so
 
 debug_compile_flags = "-O0 -w -c -fpic -g -std=c++11"
 release_compile_flags = "-O3 -w -c -fpic -std=c++11"
