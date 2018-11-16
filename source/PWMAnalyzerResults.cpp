@@ -4,6 +4,10 @@
 #include "PWMAnalyzerSettings.h"
 #include <fstream>
 
+#ifdef WIN32
+#define snprintf _snprintf
+#endif
+
 PWMAnalyzerResults::PWMAnalyzerResults(PWMAnalyzer *analyzer, PWMAnalyzerSettings *settings)
     :   AnalyzerResults(),
         mSettings(settings),
