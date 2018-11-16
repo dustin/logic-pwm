@@ -4,6 +4,10 @@
 #include "PWMAnalyzerSettings.h"
 #include <fstream>
 
+#ifdef WIN32
+#define snprintf _snprintf
+#endif
+
 PWMAnalyzerResults::PWMAnalyzerResults(PWMAnalyzer *analyzer, PWMAnalyzerSettings *settings)
     :   AnalyzerResults(),
         mSettings(settings),
@@ -118,7 +122,7 @@ void PWMAnalyzerResults::FillDelta(U64 frame_index, char *b, size_t len)
     double prevval = mAnalyzer->Value(prev.mStartingSampleInclusive, prev.mData1,
                                       prev.mEndingSampleInclusive);
 
-    snprintf(b, len, len, " (%s%.0f)", (val-prevval > 0 ? "+" : ""), val-prevval);
+    snprintf(b, len, " (%s%.0f)", (val-prevval > 0 ? "+" : ""), val-prevval);
 }
 
 void PWMAnalyzerResults::GeneratePacketTabularText(U64 packet_id, DisplayBase display_base)
