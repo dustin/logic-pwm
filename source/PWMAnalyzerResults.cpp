@@ -33,7 +33,7 @@ void PWMAnalyzerResults::GenerateBubbleText(U64 frame_index, Channel &channel, D
 
     char number_str[128] = {0};
     char delta_str[128] = {0};
-    char *units = NULL;
+    const char *units = NULL;
     FillDelta(frame_index, delta_str, sizeof(delta_str));
 
     if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
@@ -90,7 +90,7 @@ void PWMAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase d
 
     char number_str[128];
     char delta_str[128] = {0};
-    char *units = NULL;
+    const char *units = NULL;
     FillDelta(frame_index, delta_str, sizeof(delta_str));
 
     if (mSettings->mAnalysisType == ANALYSIS_WIDTH) {
