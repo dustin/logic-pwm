@@ -29,8 +29,8 @@ public:
     double Value(U64 l, U64 m, U64 e);
 
 protected: //vars
-    std::auto_ptr< PWMAnalyzerSettings > mSettings;
-    std::auto_ptr< PWMAnalyzerResults > mResults;
+    std::unique_ptr< PWMAnalyzerSettings > mSettings;
+    std::unique_ptr< PWMAnalyzerResults > mResults;
     AnalyzerChannelData *mPWM;
 
     PWMSimulationDataGenerator mSimulationDataGenerator;
