@@ -1,14 +1,13 @@
-#!/usr/bin/env python
+# Python 3 script to build the analyzer
 
 import os, glob, platform
 
 #find out if we're running on mac or linux and set the dynamic library extension
-dylib_ext = ""
 if platform.system().lower() == "darwin":
     dylib_ext = ".dylib"
 else:
     dylib_ext = ".so"
-
+    
 print("Running on " + platform.system())
 
 #make sure the release folder exists, and clean out any .o/.so file if there are any
@@ -40,12 +39,18 @@ cpp_files = glob.glob( "*.cpp" );
 os.chdir( ".." )
 
 #specify the search paths/dependencies/options for gcc
-include_paths = [ "../include", "include" ]
-link_paths = [ "../lib", "lib" ]
+include_paths = [ "./AnalyzerSDK/include" ]
+link_paths = [ "./AnalyzerSDK/lib" ]
 link_dependencies = [ "-lAnalyzer" ] #refers to libAnalyzer.dylib or libAnalyzer.so
 
-debug_compile_flags = "-O0 -w -c -fpic -g -std=c++11"
-release_compile_flags = "-O3 -w -c -fpic -std=c++11"
+debug_compile_flags = "-O0 -w -c -fpic -g"
+release_compile_flags = "-O3 -w -c -fpic"
+
+def run_command(cmd):
+    "Display cmd, then run it in a subshell, raise if there's an error"
+    print(cmd)
+    if os.system(cmd):
+        raise Exception("Shell execution returned nonzero status")
 
 #loop through all the cpp files, build up the gcc command line, and attempt to compile each cpp file
 for cpp_file in cpp_files:
@@ -54,7 +59,7 @@ for cpp_file in cpp_files:
     command = "g++ "
 
     #include paths
-    for path in include_paths:
+    for path in include_paths: 
         command += "-I\"" + path + "\" "
 
     release_command = command
@@ -68,11 +73,9 @@ for cpp_file in cpp_files:
     debug_command += "\"" + "source/" + cpp_file + "\"" #the cpp file to compile
 
     #run the commands from the command line
-    print(release_command)
-    os.system( release_command )
-    print(debug_command)
-    os.system( debug_command )
-
+    run_command(release_command)
+    run_command(debug_command)
+    
 #lastly, link
 #g++
 command = "g++ "
@@ -111,9 +114,7 @@ else:
 for cpp_file in cpp_files:
     release_command += "release/" + cpp_file.replace( ".cpp", ".o" ) + " "
     debug_command += "debug/" + cpp_file.replace( ".cpp", ".o" ) + " "
-
+    
 #run the commands from the command line
-print(release_command)
-os.system( release_command )
-print(debug_command)
-os.system( debug_command )
+run_command(release_command)
+run_command(debug_command)
