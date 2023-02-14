@@ -21,6 +21,8 @@ public:
 
     virtual const char *GetAnalyzerName() const;
     virtual bool NeedsRerun();
+#pragma warning( push )
+#pragma warning( disable : 4251 ) // warning C4251: 'SerialAnalyzer::<...>' : class <...> needs to have dll-interface to be used by clients of class
 
     double DutyCycle(U64 start, U64 mid, U64 end) { return 100.0 * double(mid-start) / double(end-start); }
     double Width(U64 l, U64 m) { return SamplesToUs(m - l); }
@@ -38,6 +40,7 @@ protected: //vars
 
     //PWM analysis vars:
     U32 mSampleRateHz;
+#pragma warning( pop )
 };
 
 extern "C" ANALYZER_EXPORT const char *__cdecl GetAnalyzerName();
