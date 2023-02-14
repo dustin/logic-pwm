@@ -44,7 +44,7 @@ bool PWMAnalyzerSettings::SetSettingsFromInterfaces()
 {
     mInputChannel = mInputChannelInterface->GetChannel();
     mMinChange = mMinChangeInterface->GetInteger();
-    mAnalysisType = mAnalysisTypeInterface->GetNumber();
+    mAnalysisType = (int)mAnalysisTypeInterface->GetNumber();
 
     ClearChannels();
     AddChannel(mInputChannel, "PWM Analyzer", true);
